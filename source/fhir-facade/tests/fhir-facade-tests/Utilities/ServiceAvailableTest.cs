@@ -20,7 +20,7 @@ namespace fhir_facade_tests.Utilities
         public void SetUp()
         {
             // Mock CloudWatch Logs client and mock S3 client to prevent actual AWS interactions
-            var _mockCloudWatchLogsClient = new Mock<AmazonCloudWatchLogsClient>(MockBehavior.Loose, new AmazonCloudWatchLogsConfig
+            _mockCloudWatchLogsClient = new Mock<AmazonCloudWatchLogsClient>(MockBehavior.Loose, new AmazonCloudWatchLogsConfig
             {
                 RegionEndpoint = Amazon.RegionEndpoint.USEast1, // or any other region
                 ServiceURL = "https://s3.custom-endpoint.com"
@@ -50,12 +50,7 @@ namespace fhir_facade_tests.Utilities
         public async Task ServiceAvailable_Should_Return_LogServiceAvailable_When_LogClient_Is_NotNull()
         {
 
-            var _mockCloudWatchLogsClient = new Mock<AmazonCloudWatchLogsClient>(MockBehavior.Loose, new AmazonCloudWatchLogsConfig
-            {
-                RegionEndpoint = Amazon.RegionEndpoint.USEast1, // or any other region
-                ServiceURL = "https://s3.custom-endpoint.com"
-
-            });
+          
 
             // Arrange:
             _mockCloudWatchLogsClient
@@ -123,12 +118,7 @@ namespace fhir_facade_tests.Utilities
         public async Task ServiceAvailable_Should_Return_FailedMessage_On_Exception()
         {
 
-            var _mockCloudWatchLogsClient = new Mock<AmazonCloudWatchLogsClient>(MockBehavior.Loose, new AmazonCloudWatchLogsConfig
-            {
-                RegionEndpoint = Amazon.RegionEndpoint.USEast1, // or any other region
-                ServiceURL = "https://s3.custom-endpoint.com"
-
-            });
+          
 
             // Arrange
             _mockCloudWatchLogsClient

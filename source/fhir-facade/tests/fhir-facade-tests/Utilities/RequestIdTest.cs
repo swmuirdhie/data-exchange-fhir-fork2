@@ -1,4 +1,5 @@
 ﻿using Amazon.CloudWatchLogs;
+using Amazon.S3;
 using Moq;
 using OneCDP.Logging;
 using OneCDPFHIRFacade.Utilities;
@@ -16,8 +17,17 @@ namespace fhir_facade_tests.UtilitiesTest
         [SetUp]
         public void SetUp()
         {
+
+            _mockCloudWatchLogsClient = new Mock<AmazonCloudWatchLogsClient>(MockBehavior.Loose, new AmazonCloudWatchLogsConfig
+            {
+                RegionEndpoint = Amazon.RegionEndpoint.USEast1, // or any other region
+                ServiceURL = "https://s3.custom-endpoint.com"
+
+            });
+
+           
             // Mock CloudWatch Logs client to prevent actual AWS interactions
-            _mockCloudWatchLogsClient = new Mock<AmazonCloudWatchLogsClient>();
+           
 
             // Create instance of LoggerService with mock dependency
             _loggerService = new LoggerService(_mockCloudWatchLogsClient.Object, "TestLogGroup");
