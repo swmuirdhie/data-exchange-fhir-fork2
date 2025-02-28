@@ -1,43 +1,61 @@
+name: Generate Coverage Report
 
-name: .NET Core CI with Code Coverage and ReportGenerator
-
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  generate-report:
+    runs-on: ubuntu-latest  # Or any other runner depending on your environment
 
     steps:
-      # Step 1: Checkout the repository code
-      - name: Checkout code
-        uses: actions/checkout@v2
+    # Checkout the code
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      # Step 2: Set up .NET SDK (specify version if needed)
-      - name: Set up .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '6.0'  # Replace with your .NET version
+    # Setup .NET (if you're using a .NET project, change accordingly)
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+         dotnet-version: 8.0.x
 
-      # Step 3: Restore dependencies
-      - name: Restore dependencies
-        run: dotnet restore
+    # Install ReportGenerator via NuGet (or you can install it globally if not already installed)
+    - name: Install ReportGenerator
+      run: dotnet tool install -g dotnet-reportgenerator-globaltool 
+     # dotnet tool install --global dotnet-reportgenerator-globaltool
+     # working-directory: source/fhir-facade/tests/fhir-facade-tests  
 
-      # Step 4: Run tests with coverage collection (using Coverlet)
-      - name: Run tests with coverage
-        run: dotnet test --collect:"XPlat Code Coverage"
+    # Build your project (if needed)
+    - name: Build project
+      run: |
+        dotnet build
+      working-directory: source/fhir-facade
 
-      # Step 5: Install ReportGenerator tool
-      - name: Install ReportGenerator tool
-        run: |
-          dotnet tool install --global dotnet-reportgenerator-globaltool
 
-      # Step 6: Generate coverage report using ReportGenerator
-      - name: Generate code coverage report
-        run: |
-          reportgenerator "-reports:TestResults/*/coverage.cobertura.xml" "-targetdir:coverage-report" -reporttypes:Html
+    - name: Test
+      run: dotnet test --no-build --verbosity normal --logger trx --results-directory "TestResults" --collect:"XPlat Code Coverage"
+      working-directory: source/fhir-facade
+      
+    # Run tests and generate the coverage file (adjust this for your specific testing framework)
+   # - name: Run tests
+   #   run:  dotnet test --collect:"XPlat Code Coverage"
+   #   working-directory: source/fhir-facade/tests
 
-      # Step 7: Upload the generated coverage report as an artifact
-      - name: Upload coverage report
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-report
-          path: coverage-report/*
+    # Generate the coverage report
+    - name: Generate Coverage Report
+      run: reportgenerator -reports:**/coverage.cobertura.xml -targetdir:coveragereport
+      working-directory: source/fhir-facade
+   #   env:
+   #     PATH: ${{ github.workspace }}/.dotnet/tools:$PATH  # Ensure the .NET tools path is in the environment
+      
+
+    # Upload the coverage report as an artifact (optional, if you want to view it after the job)
+    - name: Upload coverage report artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: source/fhir-facade/coveragereport/**/* 
