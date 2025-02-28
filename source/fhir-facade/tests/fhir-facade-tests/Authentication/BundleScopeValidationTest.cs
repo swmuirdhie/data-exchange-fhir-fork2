@@ -12,8 +12,8 @@ namespace fhir_facade_tests.Authentication
     public class BundleScopeValidationTest
     {
         private Mock<AmazonCloudWatchLogsClient> _mockCloudWatchLogsClient;
-        private LoggerService _loggerService;
-        private LogToS3BucketService _logToS3BucketService;
+    //    private LoggerService _loggerService;
+   //     private LogToS3BucketService _logToS3BucketService;
 
         [SetUp]
         public void SetUp()
@@ -21,8 +21,8 @@ namespace fhir_facade_tests.Authentication
             // Mock CloudWatch Logs client to prevent actual AWS interactions
             _mockCloudWatchLogsClient = new Mock<AmazonCloudWatchLogsClient>();
             // Create instance of LoggerService with mock dependency
-            _loggerService = new LoggerService(_mockCloudWatchLogsClient.Object, "TestUserScope");
-            _logToS3BucketService = new LogToS3BucketService();
+      //      _loggerService = new LoggerService(_mockCloudWatchLogsClient.Object, "TestUserScope");
+        //    _logToS3BucketService = new LogToS3BucketService();
 
         }
 
@@ -30,8 +30,12 @@ namespace fhir_facade_tests.Authentication
         public async System.Threading.Tasks.Task BundleScopeValidator_Scope_Match_BundleProfile()
         {
             // Arrange
+            var loggerService = new Mock<LoggerService>();
+            var logToS3BucketService = new Mock<ILogToS3BucketService>();
+            string requestId = Guid.NewGuid().ToString();
+            var mockLoggingUtility = new Mock<LoggingUtility>(loggerService.Object, logToS3BucketService.Object, requestId);
 
-            var loggingUtility = new LoggingUtility(_loggerService, _logToS3BucketService, "123");
+        //    var loggingUtility = new LoggingUtility(_loggerService, _logToS3BucketService, "123");
 
             Bundle bundle = new Bundle
             {
@@ -46,7 +50,7 @@ namespace fhir_facade_tests.Authentication
 
             AwsConfig.ScopeClaim = new string[] { "system/bundle.c", "org/org-name1", "stream/eicr-composition" };
             // Create an instance of BundleScopeValidation with mock dependencies
-            BundleScopeValidation bundleScopeValidation = new BundleScopeValidation(bundle, loggingUtility);
+            BundleScopeValidation bundleScopeValidation = new BundleScopeValidation(bundle, mockLoggingUtility.Object);
 
             // Act
             bool isValid = await bundleScopeValidation.IsBundleProfileMatchScope();
@@ -58,8 +62,10 @@ namespace fhir_facade_tests.Authentication
         [Test]
         public async System.Threading.Tasks.Task BundleScopeValidator_Scope_DoesNotMatch_BundleProfile()
         {
-            // Arrange
-            var loggingUtility = new LoggingUtility(_loggerService, _logToS3BucketService, "123");
+            var loggerService = new Mock<LoggerService>();
+            var logToS3BucketService = new Mock<ILogToS3BucketService>();
+            string requestId = Guid.NewGuid().ToString();
+            var mockLoggingUtility = new Mock<LoggingUtility>(loggerService.Object, logToS3BucketService.Object, requestId);
 
             Bundle bundle2 = new Bundle
             {
@@ -75,7 +81,7 @@ namespace fhir_facade_tests.Authentication
 
 
             // Create an instance of BundleScopeValidation with mock dependencies
-            BundleScopeValidation bundleScopeValidation = new BundleScopeValidation(bundle2, loggingUtility);
+            BundleScopeValidation bundleScopeValidation = new BundleScopeValidation(bundle2, mockLoggingUtility.Object);
 
             // Act
             bool isNotValid = await bundleScopeValidation.IsBundleProfileMatchScope();
