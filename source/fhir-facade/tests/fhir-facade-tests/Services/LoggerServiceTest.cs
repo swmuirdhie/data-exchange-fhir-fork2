@@ -16,6 +16,8 @@ namespace fhir_facade_tests.ServicesTests
             // Mock CloudWatch Logs client to prevent actual AWS interactions
             _mockCloudWatchLogsClient = new Mock<AmazonCloudWatchLogsClient>();
 
+            _mockCloudWatchLogsClient.Setup(x => x.ListBucketsAsync(It.IsAny<CancellationToken>())).ReturnsAsync(new ListBucketsResponse());
+
             // Create instance of LoggerService with mock dependency
             _loggerService = new LoggerService(_mockCloudWatchLogsClient.Object, "TestLogGroup");
         }
