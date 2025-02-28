@@ -26,7 +26,14 @@ namespace fhir_facade_tests.Utilities
                 ServiceURL = "https://s3.custom-endpoint.com"
 
             });
-            _mockS3Client = new Mock<AmazonS3Client>();
+
+            var s3Config = new AmazonS3Config
+            {
+                RegionEndpoint = Amazon.RegionEndpoint.USEast1, // or any other region
+                ServiceURL = "https://s3.custom-endpoint.com"// Set the region for the mock
+            };
+
+            _mockS3Client = new Mock<AmazonS3Client>(s3Config) ;
 
             // Assign the mocks to the AwsConfig (simulate dependency injection)
             AwsConfig.logsClient = _mockCloudWatchLogsClient.Object;
