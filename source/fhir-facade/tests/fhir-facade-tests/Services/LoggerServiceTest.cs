@@ -27,8 +27,7 @@ namespace fhir_facade_tests.ServicesTests
 
             //     _mockCloudWatchLogsClient.Setup(x => x.ListBucketsAsync(It.IsAny<CancellationToken>())).ReturnsAsync(new ListBucketsResponse());
 
-            _mockCloudWatchLogsClient.Setup(x => x.ListBucketsAsync(It.IsAny<CancellationToken>())).ReturnsAsync(new ListBucketsResponse());
-
+        
             // Create instance of LoggerService with mock dependency
             _loggerService = new LoggerService(_mockCloudWatchLogsClient.Object, "TestLogGroup");
         }
