@@ -48,7 +48,13 @@ namespace fhir_facade_tests.ServicesTests
             var requestId = Guid.NewGuid().ToString();
             var mockLoggingUtility = new Mock<LoggingUtility>(loggerService.Object, logToS3BucketService.Object, requestId);
 
-            var mockS3Client = new Mock<AmazonS3Client>();
+            var s3Config = new AmazonS3Config
+            {
+                RegionEndpoint = Amazon.RegionEndpoint.USEast1, // or any other region
+                ServiceURL = "https://s3.custom-endpoint.com"// Set the region for the mock
+            };
+
+            var mockS3Client = new Mock<AmazonS3Client>(s3Config);
 
             // Setup the mock to capture the file content
             mockS3Client
